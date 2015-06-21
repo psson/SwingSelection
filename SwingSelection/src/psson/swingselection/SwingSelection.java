@@ -35,7 +35,7 @@ import javax.swing.JComponent;
 
 /**
  * The SwingSelection class provides a simple way of making selections in a
- * Swing application.
+ * Swing application. 
  * @author Andreas Pettersson
  */
 public class SwingSelection {
