@@ -42,7 +42,11 @@ public class SwingSelection {
     
 //<editor-fold defaultstate="collapsed" desc="Members and constructors">
     
+    private static final int NUM_SELECTION_HANDLES = 8;
+    private static final int SELECTION_HANDLE_SIZE = 3;
+    
     private final Container c;
+    private final Rectangle[] handles;
     private final InternalSelection mySel;
     
     private final SelectionMouseAdapter listener;
@@ -56,6 +60,9 @@ public class SwingSelection {
         mySel = new InternalSelection();
         this.setDefaultBorder();
         this.c.add( mySel );
+        
+        handles = new Rectangle[ NUM_SELECTION_HANDLES ];
+        initSelectionHandles();
         
         listener = new SelectionMouseAdapter();
         
@@ -129,7 +136,7 @@ public class SwingSelection {
     /**
      * Sets a default border consisting of a black line
      */
-    public void setDefaultBorder() {
+    public final void setDefaultBorder() {
         mySel.setBorder( BorderFactory.createLineBorder(Color.black) );
     }
     
@@ -140,6 +147,66 @@ public class SwingSelection {
     public void setVisible( boolean visible ) {
         mySel.setVisible( visible );
         c.repaint();
+    }
+//</editor-fold>
+    
+//<editor-fold defaultstate="collapsed" desc="Selection handles">
+    /**
+     * Initializes the array of selection handles to Rectangles
+     */
+    private void initSelectionHandles() {
+        
+        for ( int i = 0 ; i < NUM_SELECTION_HANDLES ; i++ ) {
+            handles[ i ] = new Rectangle();
+        }
+    }
+    
+    /**
+     * Calculates and sets the selection handles associated with the selection.
+     */
+    private void setSelectionHandles() {
+        
+        // Get limits of selection for easier
+        int width = mySel.getWidth();       // Width
+        int height = mySel.getHeight();     // Height
+        int left = mySel.getX();            // Left side x-coordinate
+        int right = left + width;           // Right side x-coordinate
+        int top = mySel.getY();             // Top y-coordinate
+        int bottom = top + height;          // Bottom y-coordinate
+        
+        // Upper left corner handle
+        handles[0].setBounds( left, top, SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE );
+        // Upper right corner handle
+        handles[1].setBounds( right - SELECTION_HANDLE_SIZE, top, SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE );
+        // Lower left corner handle
+        handles[2].setBounds( left, bottom - SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE );
+        // Lower right corner handle
+        handles[3].setBounds( right - SELECTION_HANDLE_SIZE, bottom - SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE );
+        // Upper edge handle
+        handles[4].setBounds( left, top, width, SELECTION_HANDLE_SIZE );
+        // Bottom edge handle
+        handles[5].setBounds( left, bottom - SELECTION_HANDLE_SIZE, width, SELECTION_HANDLE_SIZE );
+        // Left edge handle
+        handles[6].setBounds( left, top, SELECTION_HANDLE_SIZE, height);
+        // Right edge handle
+        handles[7].setBounds( left - SELECTION_HANDLE_SIZE, top, SELECTION_HANDLE_SIZE, height);
+    }
+    
+    /**
+     * Checks whether Point p is inside one of the selection handles
+     * @param p point to check against selection handles
+     * @return number of handle or 0 if not inside a handle
+     */
+    private int inHandle( Point p ) {
+        
+        for( int i = 0 ; i < NUM_SELECTION_HANDLES ; i++ ) {
+            if( handles[ i ].contains( p ) ) {
+                return i + 1;
+            }
+        }
+        
+        return 0;   // No handle contained the point, return 0
+        
     }
 //</editor-fold>
     
