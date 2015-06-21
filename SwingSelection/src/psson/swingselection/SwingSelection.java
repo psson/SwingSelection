@@ -32,14 +32,14 @@ import javax.swing.JComponent;
 
 /**
  * The SwingSelection class provides a simple way of making selections in a
- * Swing application.
+ * Swing application. 
  * @author Andreas Pettersson
  */
 public class SwingSelection {
     
 //<editor-fold defaultstate="collapsed" desc="Members and constructors">
     private static final int NUM_SELECTION_HANDLES = 8;
-    private static final int SELECTION_HANDLE_SIZE = 5;
+    private static final int SELECTION_HANDLE_SIZE = 3;
     
     private final Container c;
     private final Rectangle[] handles;
