@@ -25,6 +25,7 @@ package psson.swingselection;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
@@ -42,8 +43,19 @@ public class SwingSelection {
     
 //<editor-fold defaultstate="collapsed" desc="Members and constructors">
     
-    private static final int NUM_SELECTION_HANDLES = 8;
+    private static final int NUM_SELECTION_HANDLES = 9;
     private static final int SELECTION_HANDLE_SIZE = 3;
+    
+    private static final int NOT_IN_HANDLE = 0;
+    private static final int UPPER_LEFT_HANDLE = 1;
+    private static final int UPPER_RIGHT_HANDLE = 2;
+    private static final int LOWER_LEFT_HANDLE = 3;
+    private static final int LOWER_RIGHT_HANDLE = 4;
+    private static final int UPPER_EDGE_HANDLE = 5;
+    private static final int LOWER_EDGE_HANDLE = 6;
+    private static final int LEFT_EDGE_HANDLE = 7;
+    private static final int RIGHT_EDGE_HANDLE = 8;
+    
     
     private final Container c;
     private final Rectangle[] handles;
@@ -96,11 +108,6 @@ public class SwingSelection {
      * @return true if the selection contains x,y
      */
     public boolean contains( int x, int y ) {
-        //TODO The documentation for contains( Point p ) states that the Point
-        // is taken to be relative to the coordinates of the component
-        // Check if this is also true for this function
-        // If true, modify input here, otherwise check and modify
-        // contains( Point p ) if needed.
         return mySel.contains( x, y );
     }
     
@@ -111,9 +118,6 @@ public class SwingSelection {
      */
     public boolean contains( Point p ) {
         // Wrapper for contains( int x, int y)
-        //TODO See TODO for contains( int x, int y )
-        // Check other function first to avoid needlessly redoing
-        // coordinate adjustments
         return this.contains( (int)p.getX(), (int)p.getY() );
     }
     
@@ -174,22 +178,23 @@ public class SwingSelection {
         int top = mySel.getY();             // Top y-coordinate
         int bottom = top + height;          // Bottom y-coordinate
         
+        // Don't init handle[ 0 ], this is an unused dummy handle 
         // Upper left corner handle
-        handles[0].setBounds( left, top, SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE );
+        handles[ UPPER_LEFT_HANDLE ].setBounds( left, top, SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE );
         // Upper right corner handle
-        handles[1].setBounds( right - SELECTION_HANDLE_SIZE, top, SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE );
+        handles[ UPPER_RIGHT_HANDLE ].setBounds( right - SELECTION_HANDLE_SIZE, top, SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE );
         // Lower left corner handle
-        handles[2].setBounds( left, bottom - SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE );
+        handles[ LOWER_LEFT_HANDLE ].setBounds( left, bottom - SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE );
         // Lower right corner handle
-        handles[3].setBounds( right - SELECTION_HANDLE_SIZE, bottom - SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE );
+        handles[ LOWER_RIGHT_HANDLE ].setBounds( right - SELECTION_HANDLE_SIZE, bottom - SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE, SELECTION_HANDLE_SIZE );
         // Upper edge handle
-        handles[4].setBounds( left, top, width, SELECTION_HANDLE_SIZE );
+        handles[ UPPER_EDGE_HANDLE ].setBounds( left, top, width, SELECTION_HANDLE_SIZE );
         // Bottom edge handle
-        handles[5].setBounds( left, bottom - SELECTION_HANDLE_SIZE, width, SELECTION_HANDLE_SIZE );
+        handles[ LOWER_EDGE_HANDLE ].setBounds( left, bottom - SELECTION_HANDLE_SIZE, width, SELECTION_HANDLE_SIZE );
         // Left edge handle
-        handles[6].setBounds( left, top, SELECTION_HANDLE_SIZE, height);
+        handles[ LEFT_EDGE_HANDLE ].setBounds( left, top, SELECTION_HANDLE_SIZE, height);
         // Right edge handle
-        handles[7].setBounds( left - SELECTION_HANDLE_SIZE, top, SELECTION_HANDLE_SIZE, height);
+        handles[ RIGHT_EDGE_HANDLE ].setBounds( left - SELECTION_HANDLE_SIZE, top, SELECTION_HANDLE_SIZE, height);
     }
     
     /**
@@ -199,13 +204,14 @@ public class SwingSelection {
      */
     private int inHandle( Point p ) {
         
-        for( int i = 0 ; i < NUM_SELECTION_HANDLES ; i++ ) {
+        // Check all handles except dummy handle
+        for( int i = 1 ; i < NUM_SELECTION_HANDLES ; i++ ) {
             if( handles[ i ].contains( p ) ) {
-                return i + 1;
+                return i;
             }
         }
         
-        return 0;   // No handle contained the point, return 0
+        return NOT_IN_HANDLE;   // No handle contained the point, return NOT_IN_HANDLE
         
     }
 //</editor-fold>
@@ -215,6 +221,36 @@ public class SwingSelection {
      * InternalSelection class that is the actual component added to the parent Container.
      */
     private class InternalSelection extends JComponent {
+        
+        /**
+         * Checks if a position is inside the selection. The position is specified by two coordinates relative to the container the SwingSelection is attached to. The selection includes its borders.
+         * @param x x-coordinate of the position
+         * @param y y-coordinate of the position
+         * @return true if coordinates are inside the selection, otherwise false.
+         */
+        @Override
+        public boolean contains( int x, int y ) {
+            
+            //TODO Figure out if the selection should include its borders
+            
+            if( x >= super.getX() && x < ( super.getX() + super.getWidth() ) ) {
+                if( y >= super.getY() && y < ( super.getY() + super.getHeight() ) ) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        /**
+         * Checks if a point is inside the selection. The point is specified relative to the container the SwingSelection is attached to. The selection includes its borders.
+         * @param p a Point relative to the container
+         * @return true if the point is inside the selection, otherwise false
+         */
+        @Override
+        public boolean contains( Point p ) {
+            return this.contains( (int)p.getX(), (int)p.getY() );
+        }
         
         /**
          * Sets bounds based on two points
@@ -256,11 +292,62 @@ public class SwingSelection {
         
         private Point fp, mp;
         
+        private int activeHandle;
+        
         public SelectionMouseAdapter() {
             
             fp = new Point();
             mp = new Point();
             
+            activeHandle = 0;
+            
+        }
+        
+        @Override
+        public void mouseMoved( MouseEvent e ) {
+            
+            if( mySel.isVisible() ) {
+                
+                activeHandle = inHandle( e.getPoint() );
+                
+                switch( activeHandle ) {
+                    case UPPER_LEFT_HANDLE:
+                        c.setCursor( new Cursor( Cursor.NW_RESIZE_CURSOR ) );
+                        break;
+                    case UPPER_RIGHT_HANDLE:
+                        c.setCursor( new Cursor( Cursor.NE_RESIZE_CURSOR ) );
+                        break;
+                    case LOWER_LEFT_HANDLE:
+                        c.setCursor( new Cursor( Cursor.SW_RESIZE_CURSOR ) );
+                        break;
+                    case LOWER_RIGHT_HANDLE:
+                        c.setCursor( new Cursor( Cursor.SE_RESIZE_CURSOR ) );
+                        break;
+                    case UPPER_EDGE_HANDLE:
+                        c.setCursor( new Cursor( Cursor.N_RESIZE_CURSOR ) );
+                        break;
+                    case LOWER_EDGE_HANDLE:
+                        c.setCursor( new Cursor( Cursor.S_RESIZE_CURSOR ) );
+                        break;
+                    case LEFT_EDGE_HANDLE:
+                        c.setCursor( new Cursor( Cursor.W_RESIZE_CURSOR ) );
+                        break;
+                    case RIGHT_EDGE_HANDLE:
+                        c.setCursor( new Cursor( Cursor.E_RESIZE_CURSOR ) );
+                        break;
+                    default:
+                        if( mySel.contains( e.getPoint() ) ) {
+                            // Pointer inside selection, set move cursor
+                            c.setCursor( new Cursor( Cursor.MOVE_CURSOR ) );
+                        } else {
+                            // All other cases, normal cursor
+                            c.setCursor( new Cursor( Cursor.DEFAULT_CURSOR ) );
+                        }
+                        break;
+                }
+            } else {
+                c.setCursor( new Cursor( Cursor.DEFAULT_CURSOR ));
+            }
         }
         
         @Override
