@@ -194,7 +194,7 @@ public class SwingSelection {
         // Left edge handle
         handles[ LEFT_EDGE_HANDLE ].setBounds( left, top, SELECTION_HANDLE_SIZE, height);
         // Right edge handle
-        handles[ RIGHT_EDGE_HANDLE ].setBounds( left - SELECTION_HANDLE_SIZE, top, SELECTION_HANDLE_SIZE, height);
+        handles[ RIGHT_EDGE_HANDLE ].setBounds( right - SELECTION_HANDLE_SIZE, top, SELECTION_HANDLE_SIZE, height);
     }
     
     /**
@@ -223,14 +223,12 @@ public class SwingSelection {
     private class InternalSelection extends JComponent {
         
         /**
-         * Checks if a position is inside the selection. The position is specified by two coordinates relative to the container the SwingSelection is attached to. The selection includes its borders.
+         * Checks if a position is inside the selection. The position is specified by two coordinates relative to the container the SwingSelection is attached to.
          * @param x x-coordinate of the position
          * @param y y-coordinate of the position
          * @return true if coordinates are inside the selection, otherwise false.
          */
         public boolean containsContainerCoords( int x, int y ) {
-            
-            //TODO Figure out if the selection should include its borders
             
             if( x >= super.getX() && x < ( super.getX() + super.getWidth() ) ) {
                 if( y >= super.getY() && y < ( super.getY() + super.getHeight() ) ) {
@@ -242,7 +240,7 @@ public class SwingSelection {
         }
         
         /**
-         * Checks if a point is inside the selection. The point is specified relative to the container the SwingSelection is attached to. The selection includes its borders.
+         * Checks if a point is inside the selection. The point is specified relative to the container the SwingSelection is attached to.
          * @param p a Point relative to the container
          * @return true if the point is inside the selection, otherwise false
          */
@@ -374,6 +372,8 @@ public class SwingSelection {
             mp = e.getPoint();
             
             mySel.setBounds( fp, mp );
+            
+            setSelectionHandles();
             
             mySel.repaint();
             
