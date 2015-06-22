@@ -228,8 +228,7 @@ public class SwingSelection {
          * @param y y-coordinate of the position
          * @return true if coordinates are inside the selection, otherwise false.
          */
-        @Override
-        public boolean contains( int x, int y ) {
+        public boolean containsContainerCoords( int x, int y ) {
             
             //TODO Figure out if the selection should include its borders
             
@@ -247,9 +246,8 @@ public class SwingSelection {
          * @param p a Point relative to the container
          * @return true if the point is inside the selection, otherwise false
          */
-        @Override
-        public boolean contains( Point p ) {
-            return this.contains( (int)p.getX(), (int)p.getY() );
+        public boolean containsContainerPoint( Point p ) {
+            return this.containsContainerCoords( (int)p.getX(), (int)p.getY() );
         }
         
         /**
@@ -336,7 +334,7 @@ public class SwingSelection {
                         c.setCursor( new Cursor( Cursor.E_RESIZE_CURSOR ) );
                         break;
                     default:
-                        if( mySel.contains( e.getPoint() ) ) {
+                        if( mySel.containsContainerPoint( e.getPoint() )) {
                             // Pointer inside selection, set move cursor
                             c.setCursor( new Cursor( Cursor.MOVE_CURSOR ) );
                         } else {
