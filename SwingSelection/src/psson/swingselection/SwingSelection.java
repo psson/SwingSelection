@@ -277,6 +277,23 @@ public class SwingSelection {
             
         }
         
+        public void move( Point oldPoint, Point newPoint ) {
+            
+            Rectangle sel;
+            
+            sel = this.getBounds();
+            
+            double x, y;   // New coordinates
+            
+            // Calculate new position for selection
+            x = sel.getX() + ( newPoint.getX() - oldPoint.getX() );
+            y = sel.getY() + ( newPoint.getY() - oldPoint.getY() );
+            
+            sel.setLocation( (int)x, (int)y );
+            
+            this.setBounds( sel );
+        }
+        
     }
 //</editor-fold>
     
@@ -382,6 +399,8 @@ public class SwingSelection {
                 //TODO Code to resize selection here
             } else if( moveSelection) {
                 //TODO Code to move selection here
+                mySel.move(fp, mp);
+                fp = mp;
             } else {
                 // Drag a new selection
                 mySel.setBounds( fp, mp );
@@ -400,6 +419,7 @@ public class SwingSelection {
                 //TODO Code to finish resizing here
             } else if ( moveSelection ) {
                 //TODO Code to finish moving here
+                mySel.move(fp, mp);
             } else {
                 // Finish 
                 mySel.setBounds( fp, mp );
