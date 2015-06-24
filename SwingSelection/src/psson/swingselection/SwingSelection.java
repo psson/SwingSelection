@@ -152,6 +152,14 @@ public class SwingSelection {
         mySel.setVisible( visible );
         c.repaint();
     }
+    
+    /**
+    * Sets whether or not the selection should stay inside the parent container
+    * @param stayInside true if selection should be locked inside the parent container, otherwise false
+    */
+    public void stayInsideContainer( boolean stayInside ) {
+        mySel.stayInsideContainer( stayInside );
+    }
 //</editor-fold>
     
 //<editor-fold defaultstate="collapsed" desc="Selection handles">
@@ -222,6 +230,13 @@ public class SwingSelection {
      */
     private class InternalSelection extends JComponent {
         
+        private boolean inContainer;
+        
+        public InternalSelection() {
+            super();
+            inContainer = false;
+        }
+        
         /**
          * Checks if a position is inside the selection. The position is specified by two coordinates relative to the container the SwingSelection is attached to.
          * @param x x-coordinate of the position
@@ -277,6 +292,11 @@ public class SwingSelection {
             
         }
         
+        /**
+         * Adjusts the position of the selecrtion based on the relative position of the two points. If newPoint is below oldPoint, the selection will move downward the same distance that separates oldPoint and newPoint.
+         * @param oldPoint base point
+         * @param newPoint new point 
+         */
         public void move( Point oldPoint, Point newPoint ) {
             
             Rectangle sel;
@@ -289,9 +309,32 @@ public class SwingSelection {
             x = sel.getX() + ( newPoint.getX() - oldPoint.getX() );
             y = sel.getY() + ( newPoint.getY() - oldPoint.getY() );
             
+            if( inContainer ) {
+                if( x < 0 ) {
+                    x = 0;
+                }
+                if( x + sel.getWidth() > c.getWidth() ) {
+                    x = c.getWidth() - sel.getWidth();
+                }
+                if( y < 0 ) {
+                    y = 0;
+                }
+                if( y + sel.getHeight() > c.getHeight() ) {
+                    y = c.getHeight() - sel.getHeight();
+                }
+            }
+            
             sel.setLocation( (int)x, (int)y );
             
             this.setBounds( sel );
+        }
+        
+        /**
+         * Sets whether or not the selection should stay inside the parent container
+         * @param stayInside true if selection should be locked inside the parent container, otherwise false
+         */
+        public void stayInsideContainer( boolean stayInside ) {
+            inContainer = stayInside;
         }
         
     }
@@ -398,7 +441,7 @@ public class SwingSelection {
             if( activeHandle > 0 ) {
                 //TODO Code to resize selection here
             } else if( moveSelection) {
-                //TODO Code to move selection here
+                // Move selection
                 mySel.move(fp, mp);
                 fp = mp;
             } else {
@@ -418,7 +461,7 @@ public class SwingSelection {
             if( activeHandle > 0 ) {
                 //TODO Code to finish resizing here
             } else if ( moveSelection ) {
-                //TODO Code to finish moving here
+                // Finish moving selection
                 mySel.move(fp, mp);
             } else {
                 // Finish 
