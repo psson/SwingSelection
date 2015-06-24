@@ -290,12 +290,16 @@ public class SwingSelection {
         
         private int activeHandle;
         
+        private boolean moveSelection;
+        
         public SelectionMouseAdapter() {
             
             fp = new Point();
             mp = new Point();
             
             activeHandle = 0;
+            
+            moveSelection = false;
             
         }
         
@@ -351,6 +355,20 @@ public class SwingSelection {
             
             fp = e.getPoint();
             
+            // Don't move or resize invisible selection
+            if( mySel.isVisible() ) {
+                activeHandle = inHandle( e.getPoint() );
+                if( activeHandle > 0 ) {
+                    // In selection handle, resize
+                } else if( mySel.containsContainerPoint( e.getPoint() ) ) {
+                    // Inside selection, prepare to move
+                    moveSelection = true;
+                } else {
+                    // Outside selection, do nothing
+                }
+            }
+            
+            // Selection should always be visible after mouse button has been pressed
             mySel.setVisible( true );
             
         }
@@ -360,7 +378,14 @@ public class SwingSelection {
             
             mp = e.getPoint();
             
-            mySel.setBounds( fp, mp );
+            if( activeHandle > 0 ) {
+                //TODO Code to resize selection here
+            } else if( moveSelection) {
+                //TODO Code to move selection here
+            } else {
+                // Drag a new selection
+                mySel.setBounds( fp, mp );
+            }
             
             mySel.repaint();
             
@@ -371,7 +396,16 @@ public class SwingSelection {
             
             mp = e.getPoint();
             
-            mySel.setBounds( fp, mp );
+            if( activeHandle > 0 ) {
+                //TODO Code to finish resizing here
+            } else if ( moveSelection ) {
+                //TODO Code to finish moving here
+            } else {
+                // Finish 
+                mySel.setBounds( fp, mp );
+            }
+            
+            moveSelection = false;
             
             setSelectionHandles();
             
