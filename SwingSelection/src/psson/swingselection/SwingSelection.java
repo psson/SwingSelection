@@ -130,7 +130,7 @@ public class SwingSelection {
     }
     
     /**
-     * Sets the borde of the selection
+     * Sets the border of the selection
      * @param b the border to be rendered for the selection
      */
     public void setBorder( Border b ) {
@@ -222,6 +222,58 @@ public class SwingSelection {
         return NOT_IN_HANDLE;   // No handle contained the point, return NOT_IN_HANDLE
         
     }
+    
+    /**
+     * Returns a point opposite the current handle
+     * @param activeHandle the current handle selected
+     * @return point to the opposite handle
+     */
+    private Point getOppositePoint( int activeHandle ) {
+        
+        Point oppPoint = new Point();
+        
+        switch( activeHandle ) {
+            case UPPER_LEFT_HANDLE:
+                // Return point to lower right corner
+                oppPoint.setLocation( mySel.getX() + mySel.getWidth(), mySel.getY() + mySel.getHeight() );
+                break;
+            case UPPER_RIGHT_HANDLE:
+                // Return point to lower left corner
+                oppPoint.setLocation( mySel.getX(), mySel.getY() + mySel.getHeight() );
+                break;
+            case LOWER_LEFT_HANDLE:
+                // Return point to upper right corner
+                oppPoint.setLocation( mySel.getX() + mySel.getWidth(), mySel.getY() );
+                break;
+            case LOWER_RIGHT_HANDLE:
+                // Return point to upper left corner
+                oppPoint = mySel.getLocation();
+                break;
+            case UPPER_EDGE_HANDLE:
+                // Return point to lower right corner
+                oppPoint.setLocation( mySel.getX() + mySel.getWidth(), mySel.getY() + mySel.getHeight() );
+                break;
+            case LOWER_EDGE_HANDLE:
+                // Return point to upper left corner
+                oppPoint = mySel.getLocation();
+                break;
+            case LEFT_EDGE_HANDLE:
+                // Return point to lower right corner
+                oppPoint.setLocation( mySel.getX() + mySel.getWidth(), mySel.getY() + mySel.getHeight() );
+                break;
+            case RIGHT_EDGE_HANDLE:
+                // Return point to upper left corner
+                oppPoint = mySel.getLocation();
+                break;
+            default:
+                // Error, should not be possible
+                //TODO Add exception if bad handle is entered? What to do about it?
+                oppPoint.setLocation( 0,0 );
+        }
+        
+        return oppPoint;
+        
+    }
 //</editor-fold>
     
 //<editor-fold defaultstate="collapsed" desc="InternalSelection class">
@@ -293,7 +345,7 @@ public class SwingSelection {
         }
         
         /**
-         * Adjusts the position of the selecrtion based on the relative position of the two points. If newPoint is below oldPoint, the selection will move downward the same distance that separates oldPoint and newPoint.
+         * Adjusts the position of the selection based on the relative position of the two points. If newPoint is below oldPoint, the selection will move downward the same distance that separates oldPoint and newPoint.
          * @param oldPoint base point
          * @param newPoint new point 
          */
@@ -439,7 +491,9 @@ public class SwingSelection {
             mp = e.getPoint();
             
             if( activeHandle > 0 ) {
-                //TODO Code to resize selection here
+                // Resize selection based on current handle and opposite corner
+                fp = getOppositePoint( activeHandle );
+                mySel.setBounds( fp, mp );
             } else if( moveSelection) {
                 // Move selection
                 mySel.move(fp, mp);
@@ -459,7 +513,9 @@ public class SwingSelection {
             mp = e.getPoint();
             
             if( activeHandle > 0 ) {
-                //TODO Code to finish resizing here
+                // Finish resizing selection
+                fp = getOppositePoint( activeHandle );
+                mySel.setBounds( fp, mp );
             } else if ( moveSelection ) {
                 // Finish moving selection
                 mySel.move(fp, mp);
