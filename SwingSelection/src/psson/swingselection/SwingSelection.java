@@ -266,7 +266,7 @@ public class SwingSelection {
                 oppPoint = mySel.getLocation();
                 break;
             default:
-                // Error, should not be possible
+                // Error, should not be possible. Only reachable by code that has an active handle
                 //TODO Add exception if bad handle is entered? What to do about it?
                 oppPoint.setLocation( 0,0 );
         }
