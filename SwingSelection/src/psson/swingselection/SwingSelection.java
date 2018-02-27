@@ -316,6 +316,36 @@ public class SwingSelection {
         }
         
         /**
+         * Override on setBounds( Rectangle ) method to allow for adjusting to
+         * the Container when moved, resized etc. The other member functions
+         * should point to this one.
+         * @param r a rectangle object containing the parameters
+         */
+        @Override
+        public void setBounds( Rectangle r ) {
+            
+            int x = (int)r.getX();
+            int y = (int)r.getY();
+            
+            if( inContainer ) {
+                if( x < 0 ) {
+                    x = 0;
+                }
+                if( x + r.getWidth() > c.getWidth() ) {
+                    x = (int) (c.getWidth() - r.getWidth());
+                }
+                if( y < 0 ) {
+                    y = 0;
+                }
+                if( y + r.getHeight() > c.getHeight() ) {
+                    y = (int) (c.getHeight() - r.getHeight());
+                }
+            }
+            
+            this.setBounds( x, y, (int)r.getWidth(), (int)r.getHeight());
+        }
+        
+        /**
          * Sets bounds based on two points
          * @param p1 a point in one corner of the selection
          * @param p2 the opposite corner of the selection
@@ -340,7 +370,10 @@ public class SwingSelection {
                 height = (int)( p1.getY() - p2.getY() );
             }
             
-            this.setBounds(x, y, width, height);
+            // Creating a rectangle to feed this into the overridden setBounds method
+            Rectangle r = new Rectangle( x, y, width, height );
+            
+            this.setBounds( r );
             
         }
         
@@ -360,21 +393,6 @@ public class SwingSelection {
             // Calculate new position for selection
             x = sel.getX() + ( newPoint.getX() - oldPoint.getX() );
             y = sel.getY() + ( newPoint.getY() - oldPoint.getY() );
-            
-            if( inContainer ) {
-                if( x < 0 ) {
-                    x = 0;
-                }
-                if( x + sel.getWidth() > c.getWidth() ) {
-                    x = c.getWidth() - sel.getWidth();
-                }
-                if( y < 0 ) {
-                    y = 0;
-                }
-                if( y + sel.getHeight() > c.getHeight() ) {
-                    y = c.getHeight() - sel.getHeight();
-                }
-            }
             
             sel.setLocation( (int)x, (int)y );
             
