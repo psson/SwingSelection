@@ -66,6 +66,7 @@ public class SwingSelectionTest {
     
     @After
     public void tearDown() {
+        testSel = null;
     }
 
     /**

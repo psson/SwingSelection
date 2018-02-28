@@ -26,6 +26,7 @@ package psson.swingselection;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
@@ -99,6 +100,30 @@ public class SwingSelection {
      */
     public Rectangle getBounds() {
         return mySel.getBounds();
+    }
+    
+    /**
+     * Sets the aspect ratio for the selection
+     * @param d a selection representing the ratio
+     */
+    public void setRatio( Dimension d ) {
+        mySel.setRatio( d );
+    }
+    
+    /**
+     * Returns the current ratio of the selection
+     * @return a Dimension representing the current ratio
+     */
+    public Dimension getRatio() {
+        return mySel.getRatio();
+    }
+    
+    /**
+     * Sets whether or not ratio should be preserved when resizing the selection
+     * @param b 
+     */
+    public void setPreserveRatio( boolean b ) {
+        mySel.setPreserveRatio( b );
     }
     
     /**
@@ -283,10 +308,14 @@ public class SwingSelection {
     private class InternalSelection extends JComponent {
         
         private boolean inContainer;
+        private Dimension ratio;
+        private boolean preserveRatio;
         
         public InternalSelection() {
             super();
             inContainer = false;
+            ratio = new Dimension();
+            preserveRatio = false;
         }
         
         /**
@@ -346,35 +375,94 @@ public class SwingSelection {
         }
         
         /**
-         * Sets bounds based on two points
-         * @param p1 a point in one corner of the selection
-         * @param p2 the opposite corner of the selection
+         * Sets bounds based on two points. It is important that
+         * @param fp a point in one corner of the selection, for resizing purposes this should always be the fixed point
+         * @param mp the opposite corner of the selection, for resizing purposes this should always be the moving point
          */
-        public void setBounds( Point p1, Point p2 ) {
+        public void setBounds( Point fp, Point mp ) {
             
             int x, y, width, height;
+            Dimension userDim;
+            Dimension resultDim;
             
-            if( p1.getX() < p2.getX() ) {
-                x = (int)p1.getX();
-                width = (int)( p2.getX() - p1.getX());
+            // Calculate width and height from the two points
+            width = (int) Math.abs( fp.getX() - mp.getX() );
+            height = (int) Math.abs( fp.getY() - mp.getY() );
+            
+            userDim = new Dimension( width,height );
+            
+            // If ratio is to be preserved, adjust width or height accordingly
+            if( preserveRatio ) {
+                resultDim = compareAndAdjustToRatio( userDim );
             } else {
-                x = (int)p2.getX();
-                width = (int)( p1.getX() - p2.getX() );
+                resultDim = userDim;
             }
             
-            if( p1.getY() < p2.getY() ) {
-                y = (int)p1.getY();
-                height = (int)( p2.getY() - p1.getY() );
+            // Establish x and y from fp in relation to mp
+            if( fp.getX() < mp.getX() ) {
+                x = (int)fp.getX();
             } else {
-                y = (int)p2.getY();
-                height = (int)( p1.getY() - p2.getY() );
+                x = (int)( fp.getX() - resultDim.getWidth() );
+            }
+            
+            if( fp.getY() < mp.getY() ) {
+                y = (int)fp.getY();
+            } else {
+                y = (int)( fp.getY() - resultDim.getHeight() );
             }
             
             // Creating a rectangle to feed this into the overridden setBounds method
-            Rectangle r = new Rectangle( x, y, width, height );
+            Rectangle r = new Rectangle( x, y, (int)resultDim.getWidth(), (int)resultDim.getHeight() );
             
             this.setBounds( r );
             
+        }
+        
+        /**
+        * Sets the aspect ratio for the selection
+        * @param d a selection representing the ratio
+        */
+        public void setRatio( Dimension d ) {
+            ratio = d;
+        }
+
+        /**
+        * Returns the current ratio of the selection
+        * @return a Dimension representing the current ratio
+        */
+        public Dimension getRatio() {
+            return ratio;
+        }
+
+        /**
+        * Sets whether or not ratio should be preserved when resizing the selection
+        * @param b 
+        */
+        public void setPreserveRatio( boolean b ) {
+            preserveRatio = b;
+        }
+        
+        /**
+         * This function compares the supplied Dimension to the current ratio of the 
+         * selection and returns a Dimension adjusted to match.
+         * The function adjusts the longest of the width or height to match the ratio.
+         * @param d
+         * @return 
+         */
+        private Dimension compareAndAdjustToRatio( Dimension d ) {
+            
+            double calculatedRatio = ratio.getWidth() / ratio.getHeight();
+            
+            // Compare the set ratio to that from user input
+            if( calculatedRatio > d.getWidth() / d.getHeight() ) {
+                // The set ratio is wider than the user input, adjust height
+                d.setSize( d.getWidth(), d.getWidth() / calculatedRatio );
+            } else {
+                // The set ratio is narrower than the user input, adjust width
+                d.setSize( d.getHeight() / calculatedRatio, d.getHeight() );
+            }
+            
+            return d;
         }
         
         /**
@@ -416,8 +504,10 @@ public class SwingSelection {
      */
     private class SelectionMouseAdapter extends MouseAdapter {
         
+        // fp is the fixed point that remains stationary while mp is the point dragged around by the mouse.
         private Point fp, mp;
         
+        // The handle the mouse pointer is in currently
         private int activeHandle;
         
         private boolean moveSelection;
@@ -483,6 +573,8 @@ public class SwingSelection {
         @Override
         public void mousePressed( MouseEvent e ) {
             
+            // Sets fp to the current mouse position for creating a new selection or moving an existing one
+            // If a selection is resized, fp is assigned values based on the current activeHandle
             fp = e.getPoint();
             
             // Don't move or resize invisible selection
