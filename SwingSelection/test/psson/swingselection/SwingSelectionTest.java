@@ -24,6 +24,7 @@
 package psson.swingselection;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import javax.swing.border.Border;
@@ -201,7 +202,8 @@ public class SwingSelectionTest {
     }
 
     /**
-     * Test of stayInsideContainer method, of class SwingSelection.
+     * Tests that the selection stays within the parent container when 
+     * resized or moved
      */
     @Test
     public void testStayInsideContainer() {

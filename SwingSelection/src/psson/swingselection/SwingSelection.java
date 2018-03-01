@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2015 Andreas Pettersson.
+ * Copyright 2015-2018 Andreas Pettersson.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -353,25 +353,13 @@ public class SwingSelection {
         @Override
         public void setBounds( Rectangle r ) {
             
-            int x = (int)r.getX();
-            int y = (int)r.getY();
+            // Turn rectangle into two points and feed it to setBounds( Point, Point )
             
-            if( inContainer ) {
-                if( x < 0 ) {
-                    x = 0;
-                }
-                if( x + r.getWidth() > c.getWidth() ) {
-                    x = (int) (c.getWidth() - r.getWidth());
-                }
-                if( y < 0 ) {
-                    y = 0;
-                }
-                if( y + r.getHeight() > c.getHeight() ) {
-                    y = (int) (c.getHeight() - r.getHeight());
-                }
-            }
+            Point fp = new Point( (int)r.getX(), (int)r.getY() );
+            Point mp = new Point( (int)( r.getX() + r.getWidth() ),(int)( r.getY() + r.getHeight() ) );
             
-            this.setBounds( x, y, (int)r.getWidth(), (int)r.getHeight());
+            this.setBounds( fp, mp );
+            
         }
         
         /**
@@ -411,10 +399,23 @@ public class SwingSelection {
                 y = (int)( fp.getY() - resultDim.getHeight() );
             }
             
-            // Creating a rectangle to feed this into the overridden setBounds method
-            Rectangle r = new Rectangle( x, y, (int)resultDim.getWidth(), (int)resultDim.getHeight() );
+            // If selection is set to stay in panel, adjust values
+            if( inContainer ) {
+                if( x < 0 ) {
+                    x = 0;
+                }
+                if( x + width > c.getWidth() ) {
+                    x = (int) (c.getWidth() - width );
+                }
+                if( y < 0 ) {
+                    y = 0;
+                }
+                if( y + height > c.getHeight() ) {
+                    y = (int) (c.getHeight() - height );
+                }
+            }
             
-            this.setBounds( r );
+            this.setBounds( x, y, width, height );
             
         }
         
