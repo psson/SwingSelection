@@ -344,4 +344,171 @@ public class SwingSelectionTest {
         assert( result.getY() == 0 );
     }
     
+    /**
+     * Tests that ratio is preserved in a correct way
+     */
+    @Test
+    public void testPreserveRatio() {
+        System.out.println("preserveRatio");
+        
+        testSel.setPreserveRatio( true );
+        
+        int x, y, width, height;
+        Dimension myRatio = new Dimension();
+        Rectangle r = new Rectangle();
+        Rectangle result;
+        
+        /**
+         * Testing with a 1:1 ratio
+         */
+        
+        myRatio.setSize( 1, 1 );
+        testSel.setRatio( myRatio );
+        
+        // Testing with input for a square selection
+        x = 100;
+        y = 100;
+        width = 100;
+        height = 100;
+        
+        r.setBounds( x, y, width, height );
+        testSel.setBounds( r );
+        
+        // Since width and height is equal, the selection should be unmodified
+        result = testSel.getBounds();
+        assert( result.getX() == x );
+        assert( result.getY() == y );
+        assert( result.getWidth() == width );
+        assert( result.getHeight() == height );
+        
+        // Testing with input for a wide selection
+        height = 50;
+        
+        r.setBounds( x, y, width, height );
+        testSel.setBounds( r );
+        
+        // Since height is half of width, the selection width should be altered to match height
+        result = testSel.getBounds();
+        assert( result.getX() == x );
+        assert( result.getY() == y );
+        assert( result.getWidth() == height );
+        assert( result.getHeight() == height );
+        
+        // Testing with input for a tall selection
+        width = 50;
+        height = 100;
+        
+        r.setBounds( x, y, width, height );
+        testSel.setBounds( r );
+        
+        // Since width is half of height, the selection height should be altered to match width
+        result = testSel.getBounds();
+        assert( result.getX() == x );
+        assert( result.getY() == y );
+        assert( result.getWidth() == width );
+        assert( result.getHeight() == width );
+        
+        /**
+         * Testing with a wide ratio, 2:1
+         */
+        
+        myRatio.setSize( 2, 1 );
+        testSel.setRatio( myRatio );
+        
+        // Testing with input for a square selection
+        x = 100;
+        y = 100;
+        width = 100;
+        height = 100;
+        
+        r.setBounds( x, y, width, height );
+        testSel.setBounds( r );
+        
+        // Since width and height is equal, height should be halved to match ratio
+        result = testSel.getBounds();
+        assert( result.getX() == x );
+        assert( result.getY() == y );
+        assert( result.getWidth() == width );
+        assert( result.getHeight() == width / 2 );
+        
+        // Testing with input for a wide selection
+        height = 50;
+        
+        r.setBounds( x, y, width, height );
+        testSel.setBounds( r );
+        
+        // Since height is half of width, the selection should be unmodified
+        result = testSel.getBounds();
+        assert( result.getX() == x );
+        assert( result.getY() == y );
+        assert( result.getWidth() == width );
+        assert( result.getHeight() == height );
+        
+        // Testing with input for a tall selection
+        width = 50;
+        height = 100;
+        
+        r.setBounds( x, y, width, height );
+        testSel.setBounds( r );
+        
+        // Since width is half of height, the selection height should be half of width
+        result = testSel.getBounds();
+        assert( result.getX() == x );
+        assert( result.getY() == y );
+        assert( result.getWidth() == width );
+        assert( result.getHeight() == width / 2 );
+        
+        /**
+         * Testing with a tall ratio, 1:2
+         */
+        
+        myRatio.setSize( 1, 2 );
+        testSel.setRatio( myRatio );
+        
+        // Testing with input for a square selection
+        x = 100;
+        y = 100;
+        width = 100;
+        height = 100;
+        
+        r.setBounds( x, y, width, height );
+        testSel.setBounds( r );
+        
+        // Since width and height is equal, width should be halved to match ratio
+        result = testSel.getBounds();
+        assert( result.getX() == x );
+        assert( result.getY() == y );
+        assert( result.getWidth() == height / 2 );
+        assert( result.getHeight() == height );
+        
+        // Testing with input for a wide selection
+        height = 50;
+        
+        r.setBounds( x, y, width, height );
+        testSel.setBounds( r );
+        
+        // Since height is half of width, width should be modified to half of height
+        result = testSel.getBounds();
+        assert( result.getX() == x );
+        assert( result.getY() == y );
+        assert( result.getWidth() == height / 2 );
+        assert( result.getHeight() == height );
+        
+        // Testing with input for a tall selection
+        width = 50;
+        height = 100;
+        
+        r.setBounds( x, y, width, height );
+        testSel.setBounds( r );
+        
+        // Since width is half of height, the selection should be unmodified
+        result = testSel.getBounds();
+        assert( result.getX() == x );
+        assert( result.getY() == y );
+        assert( result.getWidth() == width );
+        assert( result.getHeight() == height );
+        
+        
+    }
+    
 }

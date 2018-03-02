@@ -415,7 +415,7 @@ public class SwingSelection {
                 }
             }
             
-            this.setBounds( x, y, width, height );
+            this.setBounds( x, y, (int)resultDim.getWidth(), (int)resultDim.getHeight() );
             
         }
         
@@ -454,13 +454,28 @@ public class SwingSelection {
             
             double calculatedRatio = ratio.getWidth() / ratio.getHeight();
             
-            // Compare the set ratio to that from user input
-            if( calculatedRatio > d.getWidth() / d.getHeight() ) {
-                // The set ratio is wider than the user input, adjust height
-                d.setSize( d.getWidth(), d.getWidth() / calculatedRatio );
+            if( calculatedRatio >= 1 ) {
+                // Compare the set ratio to that from user input
+                if( calculatedRatio > d.getWidth() / d.getHeight() ) {
+                    // The set ratio is wider than the user input, adjust height
+                    d.setSize( d.getWidth(), d.getWidth() / calculatedRatio );
+                } else if ( calculatedRatio < d.getWidth() / d.getHeight() ){
+                    // The set ratio is narrower than the user input, adjust width
+                    d.setSize( d.getHeight() / calculatedRatio, d.getHeight() );
+                } else {
+                    // Selection ratio and user input matches, don't adjust
+                }
             } else {
-                // The set ratio is narrower than the user input, adjust width
-                d.setSize( d.getHeight() / calculatedRatio, d.getHeight() );
+                // Compare the set ratio to that from user input
+                if( calculatedRatio > d.getWidth() / d.getHeight() ) {
+                    // The set ratio is wider than the user input, adjust height
+                    d.setSize( d.getWidth(), d.getWidth() * calculatedRatio );
+                } else if ( calculatedRatio < d.getWidth() / d.getHeight() ){
+                    // The set ratio is narrower than the user input, adjust width
+                    d.setSize( d.getHeight() * calculatedRatio, d.getHeight() );
+                } else {
+                    // Selection ratio and user input matches, don't adjust
+                }
             }
             
             return d;
