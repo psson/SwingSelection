@@ -150,58 +150,6 @@ public class SwingSelectionTest {
     }
 
     /**
-     * Test of getBorder method, of class SwingSelection.
-     */
-    @Test
-    public void testGetBorder() {
-        System.out.println("getBorder");
-        SwingSelection instance = null;
-        Border expResult = null;
-        Border result = instance.getBorder();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of setBorder method, of class SwingSelection.
-     */
-    @Test
-    public void testSetBorder() {
-        System.out.println("setBorder");
-        Border b = null;
-        SwingSelection instance = null;
-        instance.setBorder(b);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of setDefaultBorder method, of class SwingSelection.
-     */
-    @Test
-    public void testSetDefaultBorder() {
-        System.out.println("setDefaultBorder");
-        SwingSelection instance = null;
-        instance.setDefaultBorder();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of setVisible method, of class SwingSelection.
-     */
-    @Test
-    public void testSetVisible() {
-        System.out.println("setVisible");
-        boolean visible = false;
-        SwingSelection instance = null;
-        instance.setVisible(visible);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
      * Tests that the selection stays within the parent container when 
      * resized or moved
      */
