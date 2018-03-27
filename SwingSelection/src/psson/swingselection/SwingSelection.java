@@ -598,6 +598,7 @@ public class SwingSelection {
                 activeHandle = inHandle( e.getPoint() );
                 if( activeHandle > 0 ) {
                     // In selection handle, resize
+                    fp = getOppositePoint( activeHandle );
                 } else if( mySel.containsContainerPoint( e.getPoint() ) ) {
                     // Inside selection, prepare to move
                     moveSelection = true;
@@ -617,8 +618,8 @@ public class SwingSelection {
             mp = e.getPoint();
             
             if( activeHandle > 0 ) {
+                //TODO Add code to handle dragging an edge handle
                 // Resize selection based on current handle and opposite corner
-                fp = getOppositePoint( activeHandle );
                 mySel.setBounds( fp, mp );
             } else if( moveSelection) {
                 // Move selection
